@@ -38,7 +38,7 @@ public class TodoController {
         return ApiResponse.createSuccess(todoService.update(id, todoUpdateRequest), "수정 성공");
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ApiResponse<String> delete(@PathVariable Long id) {
         todoService.delete(id);
         return ApiResponse.createSuccessWithNoData("삭제 성공");
