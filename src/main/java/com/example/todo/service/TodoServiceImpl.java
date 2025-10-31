@@ -54,6 +54,7 @@ public class TodoServiceImpl implements TodoService {
                 .orElseThrow(() -> new IllegalArgumentException("Todo not found"));
 
         todo.update(todoUpdateRequest.getTitle(), todoUpdateRequest.getContent(), todoUpdateRequest.getStatus());
+        todoRepository.flush();     // h2에서 업데이트 반영 지연 방지용 (즉시 DB flush)
         return TodoResponse.from(todo);
     }
 

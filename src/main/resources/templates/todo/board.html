@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo Board</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 20px;
+            background-color: #f7f7f9;
+        }
+
+        h1 { text-align: center; }
+
+        .board {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .column {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            min-height: 600px;
+        }
+
+        .column h2 {
+            text-align: center;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .card {
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin: 10px;
+            padding: 10px;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            cursor: grab;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        }
+
+        .card:active { cursor: grabbing; }
+
+        .card-title { font-weight: 600; margin-bottom: 5px; }
+
+        .card-content {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .btn:hover { background-color: #0056b3; }
+
+        .btn-delete { background-color: #dc3545; }
+        .btn-delete:hover { background-color: #b02a37; }
+
+        .drag-ghost {
+            opacity: 0.5;
+            background-color: #e2e6ea;
+            border: 2px dashed #007bff;
+        }
+    </style>
+</head>
+
+<body>
+<h1>🧩 Todo Board</h1>
+<div style="text-align:center; margin-bottom:15px;">
+    <a class="btn" th:href="@{/todos/new}">+ 새 할 일 추가</a>
+</div>
+
+<div class="board">
+    <!-- PLANNED -->
+    <div class="column" data-status="PLANNED">
+        <h2>PLANNED</h2>
+        <th:block th:each="todo : ${todos}">
+            <div th:if="${todo.status.name() == 'PLANNED'}"
+                 class="card"
+                 th:attr="data-id=${todo.id}">
+                <div class="card-title" th:text="${todo.title}"></div>
+                <div class="card-content" th:text="${todo.content}"></div>
+                <div class="card-footer">
+                    <span th:text="'작성자: ' + ${todo.userId}"></span>
+                    <span>
+                        <a class="btn" th:href="@{'/todos/' + ${todo.id} + '/edit'}">수정</a>
+                        <form th:action="@{'/todos/' + ${todo.id} + '/delete'}"
+                              method="post" style="display:inline;">
+                            <button class="btn btn-delete" type="submit">삭제</button>
+                        </form>
+                    </span>
+                </div>
+            </div>
+        </th:block>
+    </div>
+
+    <!-- IN_PROGRESS -->
+    <div class="column" data-status="IN_PROGRESS">
+        <h2>IN_PROGRESS</h2>
+        <th:block th:each="todo : ${todos}">
+            <div th:if="${todo.status.name() == 'IN_PROGRESS'}"
+                 class="card"
+                 th:attr="data-id=${todo.id}">
+                <div class="card-title" th:text="${todo.title}"></div>
+                <div class="card-content" th:text="${todo.content}"></div>
+                <div class="card-footer">
+                    <span th:text="'작성자: ' + ${todo.userId}"></span>
+                    <span>
+                        <a class="btn" th:href="@{'/todos/' + ${todo.id} + '/edit'}">수정</a>
+                        <form th:action="@{'/todos/' + ${todo.id} + '/delete'}"
+                              method="post" style="display:inline;">
+                            <button class="btn btn-delete" type="submit">삭제</button>
+                        </form>
+                    </span>
+                </div>
+            </div>
+        </th:block>
+    </div>
+
+    <!-- COMPLETED -->
+    <div class="column" data-status="COMPLETED">
+        <h2>COMPLETED</h2>
+        <th:block th:each="todo : ${todos}">
+            <div th:if="${todo.status.name() == 'COMPLETED'}"
+                 class="card"
+                 th:attr="data-id=${todo.id}">
+                <div class="card-title" th:text="${todo.title}"></div>
+                <div class="card-content" th:text="${todo.content}"></div>
+                <div class="card-footer">
+                    <span th:text="'작성자: ' + ${todo.userId}"></span>
+                    <span>
+                        <a class="btn" th:href="@{'/todos/' + ${todo.id} + '/edit'}">수정</a>
+                        <form th:action="@{'/todos/' + ${todo.id} + '/delete'}"
+                              method="post" style="display:inline;">
+                            <button class="btn btn-delete" type="submit">삭제</button>
+                        </form>
+                    </span>
+                </div>
+            </div>
+        </th:block>
+    </div>
+</div>
+
+<!-- Drag & Drop JS -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const columns = document.querySelectorAll(".column");
+
+        columns.forEach(column => {
+            new Sortable(column, {
+                group: "shared",
+                animation: 150,
+                ghostClass: "drag-ghost",
+                onEnd: function(evt) {
+                    const card = evt.item;
+                    const todoId = card.dataset.id;
+                    const newStatus = evt.to.dataset.status; // 이동된 컬럼의 상태
+
+                    console.log(`📦 Todo ${todoId} → ${newStatus}`);
+
+                    // 카드 내부에서 데이터 추출
+                    const title = card.querySelector(".card-title").textContent.trim();
+                    const content = card.querySelector(".card-content").textContent.trim();
+                    const userId = card.querySelector(".card-footer span").textContent.replace("작성자: ", "").trim();
+
+                    // 서버로 PUT 요청
+                    fetch(`/api/v1/todos/${todoId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            title: title,
+                            content: content,
+                            userId: userId,
+                            status: newStatus
+                        })
+                    })
+                        .then(res => {
+                            if (!res.ok) throw new Error("Failed to update status");
+                            return res.json();
+                        })
+                        .then(data => {
+                            console.log("✅ 상태 업데이트 성공:", data);
+                        })
+                        .catch(err => {
+                            console.error("❌ 상태 업데이트 실패:", err);
+                            alert("상태 업데이트 실패: " + err.message);
+                        });
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo List</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 40px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+        th { background: #f4f4f4; }
+        a, button { padding: 5px 10px; border: none; background: #007BFF; color: white; text-decoration: none; cursor: pointer; border-radius: 4px; }
+        a:hover, button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+<h1>📝 Todo 목록</h1>
+
+<div>
+    <a th:href="@{/todos/new}">+ 새 할 일 추가</a>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>작성자</th>
+        <th>제목</th>
+        <th>상태</th>
+        <th>작성일</th>
+        <th>액션</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="todo : ${todos}">
+        <td th:text="${todo.id}"></td>
+        <td th:text="${todo.userId}"></td>
+        <td th:text="${todo.title}"></td>
+        <td th:text="${todo.status}"></td>
+        <td th:text="${#temporals.format(todo.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <td>
+            <a th:href="@{'/todos/' + ${todo.id} + '/edit'}">수정</a>
+            <form th:action="@{'/todos/' + ${todo.id} + '/delete'}" method="post" style="display:inline;">
+                <button type="submit" style="background:#dc3545;">삭제</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

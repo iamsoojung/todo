@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo 수정</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 40px; }
+        label { display: block; margin-top: 10px; }
+        input, textarea, select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        button { margin-top: 20px; background: #007BFF; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+<h1>✏️ Todo 수정</h1>
+
+<form th:action="@{'/todos/' + ${todo.id} + '/edit'}" method="post">
+    <label>제목</label>
+    <input type="text" name="title" th:value="${todo.title}" required>
+
+    <label>내용</label>
+    <textarea name="content" th:text="${todo.content}"></textarea>
+
+    <label>상태</label>
+    <select name="status">
+        <option th:selected="${todo.status == 'PLANNED'}" value="PLANNED">PLANNED (예정)</option>
+        <option th:selected="${todo.status == 'IN_PROGRESS'}" value="IN_PROGRESS">IN_PROGRESS (진행중)</option>
+        <option th:selected="${todo.status == 'COMPLETED'}" value="COMPLETED">COMPLETED (완료)</option>
+    </select>
+
+    <button type="submit">저장</button>
+</form>
+
+<a th:href="@{/todos}">← 목록으로 돌아가기</a>
+</body>
+</html>
