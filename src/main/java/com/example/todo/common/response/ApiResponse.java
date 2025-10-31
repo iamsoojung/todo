@@ -3,29 +3,33 @@ package com.example.todo.common.response;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Getter
 @NoArgsConstructor
-public class ApiResponse<T> {
+public class ApiResponse<T> implements Serializable {
 
-    private boolean success;
-    private String message;
+    private static final String SUCCESS_STATUS = "C000";
+
+    private String status;
     private T data;
+    private String message;
 
-    private ApiResponse(boolean success, String message, T data) {
-        this.success = success;
-        this.message = message;
+    private ApiResponse(String status, T data, String message) {
+        this.status = status;
         this.data = data;
+        this.message = message;
     }
 
-    public static <T> ApiResponse<T> ok(T data) {
-        return new ApiResponse<>(true, "요청 성공", data);
+    public static <T> ApiResponse<T> createSuccess(T data, String message) {
+        return new ApiResponse<>(SUCCESS_STATUS, data, message);
     }
 
-    public static ApiResponse<String> ok() {
-        return new ApiResponse<>(true, "요청 성공", null);
+    public static ApiResponse<String> createSuccessWithNoData(String message) {
+        return new ApiResponse<>(SUCCESS_STATUS, null, message);
     }
 
-    public static <T> ApiResponse<T> fail(String message) {
-        return new ApiResponse<>(false, message, null);
+    public static ApiResponse<?> createError(ErrorCode errorCode) {
+        return new ApiResponse<>(errorCode.getCode(), null, errorCode.getMessage());
     }
 }
