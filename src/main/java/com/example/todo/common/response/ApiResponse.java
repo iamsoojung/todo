@@ -32,4 +32,8 @@ public class ApiResponse<T> implements Serializable {
     public static ApiResponse<?> createError(ErrorCode errorCode) {
         return new ApiResponse<>(errorCode.getCode(), null, errorCode.getMessage());
     }
+
+    public static ApiResponse<?> createErrorWithCustomMessage(ErrorCode errorCode, String customMessage) {
+        return new ApiResponse<>(errorCode.getCode(), null, customMessage);
+    }
 }
