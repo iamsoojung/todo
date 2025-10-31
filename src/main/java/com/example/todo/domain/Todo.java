@@ -31,6 +31,13 @@ public class Todo extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TodoStatus status;
 
+    @PrePersist
+    public void prePersist() {
+        if (this.status == null) {
+            this.status = TodoStatus.PLANNED;
+        }
+    }
+
     public void update(String title, String content, TodoStatus status) {
         if (title != null) {
             this.title = title;
