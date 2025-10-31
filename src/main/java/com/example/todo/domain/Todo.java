@@ -30,4 +30,16 @@ public class Todo extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private TodoStatus status;
+
+    public void update(String title, String content, TodoStatus status) {
+        if (title != null) {
+            this.title = title;
+        }
+        if (content != null) {
+            this.content = content;
+        }
+        if (status != null) {
+            this.status = status;
+        }
+    }
 }
